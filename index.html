@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSC Bangla ⇄ English Dictionary</title>
+<link rel="manifest" href="manifest.json">
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f9;
+    padding:20px;
+    text-align:center;
+}
+h2{color:#222;}
+
+input{
+    width:90%;
+    padding:12px;
+    font-size:16px;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+
+button{
+    padding:8px 12px;
+    margin:5px;
+    font-size:15px;
+    border-radius:6px;
+    border:none;
+    cursor:pointer;
+}
+
+#result{
+    margin-top:20px;
+    text-align:left;
+    background:white;
+    padding:15px;
+    border-radius:10px;
+}
+
+.dark{
+    background:#1e1e1e;
+    color:white;
+}
+
+.dark #result{
+    background:#333;
+}
+
+.suggestion{
+    text-align:left;
+    margin-top:5px;
+    font-size:14px;
+    color:#444;
+}
+</style>
+</head>
+<body>
+
+<h2>SSC Advanced Dictionary</h2>
+
+<input type="text" id="searchBox" placeholder="Type word..." oninput="suggestWord()">
+<br>
+<button onclick="searchWord()">Search</button>
+<button onclick="toggleDark()">Dark Mode</button>
+
+<div class="suggestion" id="suggestion"></div>
+<div id="result"></div>
+
+<script>
+
+// =================== SSC DICTIONARY DATA ===================
+const dictionary = {
+"achieve":{
+    meaning:"অর্জন করা",
+    pos:"Verb",
+    example:"Hard work helps students achieve success.",
+    synonym:"accomplish",
+    antonym:"fail"
+},
+"success":{
+    meaning:"সাফল্য",
+    pos:"Noun",
+    example:"Success comes from dedication.",
+    synonym:"achievement",
+    antonym:"failure"
+},
+"failure":{
+    meaning:"ব্যর্থতা",
+    pos:"Noun",
+    example:"Failure teaches valuable lessons.",
+    synonym:"defeat",
+    antonym:"success"
+},
+"honest":{
+    meaning:"সৎ",
+    pos:"Adjective",
+    example:"An honest man is respected.",
+    synonym:"truthful",
+    antonym:"dishonest"
+},
+"education":{
+    meaning:"শিক্ষা",
+    pos:"Noun",
+    example:"Education builds a nation.",
+    synonym:"learning",
+    antonym:"ignorance"
+}
+};
+
+// =================== SEARCH FUNCTION ===================
+function searchWord(){
+    const input = document.getElementById("searchBox").value.trim().toLowerCase();
+    const resultDiv = document.getElementById("result");
+
+    if(dictionary[input]){
+        const word = dictionary[input];
+        resultDiv.innerHTML = `
+            <b>Meaning:</b> ${word.meaning}<br>
+            <b>Part of Speech:</b> ${word.pos}<br>
+            <b>Example:</b> ${word.example}<br>
+            <b>Synonym:</b> ${word.synonym}<br>
+            <b>Antonym:</b> ${word.antonym}
+        `;
+
+        saveHistory(input);
+    }
+    else{
+        resultDiv.innerHTML = "Word not found!";
+    }
+}
+
+// =================== SUGGESTION ===================
+function suggestWord(){
+    const input = document.getElementById("searchBox").value.toLowerCase();
+    const suggestionDiv = document.getElementById("suggestion");
+
+    if(input.length < 1){
+        suggestionDiv.innerHTML="";
+        return;
+    }
+
+    const suggestions = Object.keys(dictionary)
+        .filter(word => word.startsWith(input))
+        .slice(0,5);
+
+    suggestionDiv.innerHTML = suggestions.join(", ");
+}
+
+// =================== DARK MODE ===================
+function toggleDark(){
+    document.body.classList.toggle("dark");
+}
+
+// =================== SEARCH HISTORY ===================
+function saveHistory(word){
+    let history = JSON.parse(localStorage.getItem("history")) || [];
+    if(!history.includes(word)){
+        history.push(word);
+        localStorage.setItem("history", JSON.stringify(history));
+    }
+}
+
+// =================== SERVICE WORKER ===================
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
+}
+
+</script>
+</body>
+</html>
